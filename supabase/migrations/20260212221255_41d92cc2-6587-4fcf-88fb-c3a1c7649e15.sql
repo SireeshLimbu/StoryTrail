@@ -1,0 +1,1 @@
+ALTER TABLE public.characters ADD COLUMN is_suspect boolean NOT NULL DEFAULT false;

@@ -1,0 +1,1 @@
+ALTER TABLE public.cities ADD COLUMN distance_km numeric(5,1) NULL;
