@@ -4,7 +4,7 @@ import WelcomeFooter from "@/components/welcome/WelcomeFooter";
 
 const WelcomePage = () => {
   return (
-    <main className="min-h-screen">
+    <main className="relative min-h-screen">
       <WelcomeNavbar />
       <TrailExperience />
       <WelcomeFooter />

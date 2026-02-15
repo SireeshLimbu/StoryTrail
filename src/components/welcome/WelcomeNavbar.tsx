@@ -57,9 +57,9 @@ const WelcomeNavbar = () => {
             animate={{ opacity: 1, y: 0 }}
             className="md:hidden pb-6 space-y-4"
           >
-            <a href="#stop-2" className="block font-display font-medium hover:text-primary transition-colors">What is StoryTrail?</a>
-            <a href="#stop-3" className="block font-display font-medium hover:text-primary transition-colors">How It Works</a>
-            <a href="#stop-5" className="block font-display font-medium hover:text-primary transition-colors">For Partners</a>
+            <a href="#stop-2" onClick={() => setIsMobileMenuOpen(false)} className="block font-display text-sm font-medium hover:text-primary transition-colors">What is StoryTrail?</a>
+            <a href="#stop-3" onClick={() => setIsMobileMenuOpen(false)} className="block font-display text-sm font-medium hover:text-primary transition-colors">How It Works</a>
+            <a href="#stop-5" onClick={() => setIsMobileMenuOpen(false)} className="block font-display text-sm font-medium hover:text-primary transition-colors">For Partners</a>
             <Button asChild className="w-full bg-gradient-warm shadow-warm hover:opacity-90 transition-opacity font-display">
               <Link to="/login?mode=signup">Sign Up</Link>
             </Button>

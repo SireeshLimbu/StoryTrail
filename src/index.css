@@ -218,4 +218,120 @@
   .trail-pin-glow {
     box-shadow: 0 0 20px hsl(42 53% 55% / 0.4), 0 0 40px hsl(42 53% 55% / 0.1);
   }
+
+  /* Arm swing — use delay (-0.3s = half cycle) for 180° phase shift.
+     Left arm + right leg share phase B; right arm + left leg share phase A. */
+  .trail-walk-left-arm {
+    animation: trail-walk-arm 0.6s ease-in-out infinite;
+    animation-delay: -0.3s;
+  }
+  .trail-walk-right-arm {
+    animation: trail-walk-arm 0.6s ease-in-out infinite;
+  }
+
+  /* Thigh swing at hip */
+  .trail-walk-left-thigh {
+    animation: trail-walk-thigh 0.6s ease-in-out infinite;
+  }
+  .trail-walk-right-thigh {
+    animation: trail-walk-thigh 0.6s ease-in-out infinite;
+    animation-delay: -0.3s;
+  }
+
+  /* Calf bend at knee — synced with thigh phase */
+  .trail-walk-left-calf {
+    animation: trail-walk-calf-l 0.6s ease-in-out infinite;
+  }
+  .trail-walk-right-calf {
+    animation: trail-walk-calf-r 0.6s ease-in-out infinite;
+  }
+
+  /* ── Front-view walk: subtle depth motion instead of sideways swing ── */
+  .trail-walk-front-left-arm {
+    animation: trail-walk-front-arm 0.6s ease-in-out infinite;
+    animation-delay: -0.3s;
+  }
+  .trail-walk-front-right-arm {
+    animation: trail-walk-front-arm 0.6s ease-in-out infinite;
+  }
+  .trail-walk-front-left-thigh {
+    animation: trail-walk-front-thigh 0.6s ease-in-out infinite;
+  }
+  .trail-walk-front-right-thigh {
+    animation: trail-walk-front-thigh 0.6s ease-in-out infinite;
+    animation-delay: -0.3s;
+  }
+  .trail-walk-front-left-calf {
+    animation: trail-walk-front-calf-l 0.6s ease-in-out infinite;
+  }
+  .trail-walk-front-right-calf {
+    animation: trail-walk-front-calf-r 0.6s ease-in-out infinite;
+  }
+
+  /* Freeze mid-stride when scrolling stops */
+  .trail-walk-frozen g[class*="trail-walk"] {
+    animation-play-state: paused !important;
+  }
+}
+
+@keyframes trail-walk-arm {
+  0%, 100% { transform: rotate(-20deg); }
+  50% { transform: rotate(20deg); }
+}
+
+@keyframes trail-walk-thigh {
+  0%, 100% { transform: rotate(-25deg); }
+  50% { transform: rotate(25deg); }
+}
+
+/* Left calf: bends as thigh swings through, straightens when extended */
+@keyframes trail-walk-calf-l {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(10deg); }
+  35%  { transform: rotate(45deg); }
+  50%  { transform: rotate(8deg); }
+  65%  { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Right calf: phase-shifted to match reversed thigh */
+@keyframes trail-walk-calf-r {
+  0%   { transform: rotate(8deg); }
+  15%  { transform: rotate(0deg); }
+  50%  { transform: rotate(0deg); }
+  70%  { transform: rotate(10deg); }
+  85%  { transform: rotate(45deg); }
+  100% { transform: rotate(8deg); }
+}
+
+/* ── Front-view keyframes ──
+   From the front, walking legs/arms move toward/away from the viewer.
+   We simulate this with small rotation (minimal sway) + translateY (depth).
+*/
+@keyframes trail-walk-front-arm {
+  0%, 100% { transform: rotate(-6deg) translateY(-4px); }
+  50%      { transform: rotate(6deg) translateY(4px); }
+}
+
+@keyframes trail-walk-front-thigh {
+  0%, 100% { transform: rotate(-6deg) translateY(-3px); }
+  50%      { transform: rotate(6deg) translateY(3px); }
+}
+
+@keyframes trail-walk-front-calf-l {
+  0%   { transform: rotate(0deg) translateY(0); }
+  25%  { transform: rotate(4deg) translateY(1.5px); }
+  40%  { transform: rotate(18deg) translateY(3px); }
+  55%  { transform: rotate(3deg) translateY(1px); }
+  70%  { transform: rotate(0deg) translateY(0); }
+  100% { transform: rotate(0deg) translateY(0); }
+}
+
+@keyframes trail-walk-front-calf-r {
+  0%   { transform: rotate(3deg) translateY(1px); }
+  15%  { transform: rotate(0deg) translateY(0); }
+  50%  { transform: rotate(0deg) translateY(0); }
+  75%  { transform: rotate(4deg) translateY(1.5px); }
+  90%  { transform: rotate(18deg) translateY(3px); }
+  100% { transform: rotate(3deg) translateY(1px); }
 }
