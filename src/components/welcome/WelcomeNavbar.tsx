@@ -22,12 +22,12 @@ const WelcomeNavbar = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.6 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-background/90 backdrop-blur-md shadow-soft" : "bg-transparent"
+        isScrolled ? "md:bg-background/90 md:backdrop-blur-md md:shadow-soft" : "bg-transparent"
       }`}
     >
       <div className="container px-6">
         <div className="flex items-center justify-between h-20">
-          <a href="/" className="flex items-center gap-2 font-display text-2xl font-bold">
+          <a href="/" className="flex items-center gap-2 font-display text-2xl font-bold bg-card/90 md:bg-transparent backdrop-blur-sm md:backdrop-blur-none rounded-lg px-3 py-1 md:px-0 md:py-0 shadow-sm md:shadow-none">
             <span className="tracking-[-0.04em]">Story<span className="text-primary">Trail</span></span>
           </a>
 
@@ -44,7 +44,7 @@ const WelcomeNavbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2"
+            className="md:hidden p-2 bg-card/90 backdrop-blur-sm rounded-lg shadow-sm"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>

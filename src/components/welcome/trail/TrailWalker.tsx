@@ -45,12 +45,13 @@ const TrailWalker = ({ scrollYProgress }: TrailWalkerProps) => {
   const pathRef = useRef<SVGPathElement>(null);
   const walkerRef = useRef<HTMLDivElement>(null);
 
-  // Set initial position
+  // Set initial position (hidden until below navbar)
   useEffect(() => {
     if (!pathRef.current || !walkerRef.current) return;
     const point = pathRef.current.getPointAtLength(0);
     walkerRef.current.style.left = `${(point.x / VIEWBOX_W) * 100}%`;
     walkerRef.current.style.top = `${(point.y / VIEWBOX_H) * 100}%`;
+    walkerRef.current.style.opacity = "1";
   }, []);
 
   const handleChange = useCallback(
@@ -65,6 +66,10 @@ const TrailWalker = ({ scrollYProgress }: TrailWalkerProps) => {
       // Update position directly on DOM for performance (no re-renders)
       walkerRef.current.style.left = `${(point.x / VIEWBOX_W) * 100}%`;
       walkerRef.current.style.top = `${(point.y / VIEWBOX_H) * 100}%`;
+
+      // Fade in once below the navbar zone (top ~4% of container)
+      walkerRef.current.style.opacity = point.y / VIEWBOX_H < 0.01 ? "0" : "1";
+      walkerRef.current.style.transition = "opacity 0.3s";
 
       // Determine facing by sampling the path direction slightly ahead
       const currentLen = Math.min(latest, 0.98) * totalLength;
@@ -121,7 +126,7 @@ const TrailWalker = ({ scrollYProgress }: TrailWalkerProps) => {
           viewBox="0 0 40 56"
           width="60"
           height="84"
-          className="overflow-visible"
+          className="overflow-visible w-[60px] h-[84px] md:w-[90px] md:h-[126px]"
           style={{
             transform: facing === "right" ? "scaleX(-1)" : "scaleX(1)",
             transition: "transform 0.2s ease-out",
