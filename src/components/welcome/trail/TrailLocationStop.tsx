@@ -30,9 +30,20 @@ const TrailLocationStop = ({
 }: TrailLocationStopProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
+  const cardAreaRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-30% 0px -30% 0px" });
   const [isRevealed, setIsRevealed] = useState(false);
   const [threshold, setThreshold] = useState((index + 0.5) / totalStops);
+  const [hideThreshold, setHideThreshold] = useState(Infinity);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   // Measure pin's actual DOM position → convert to SVG Y → binary-search path.
   // Walker is at (pathY / 500) * containerHeight from container top.
@@ -60,25 +71,47 @@ const TrailLocationStop = ({
     return () => { clearTimeout(timer); ro.disconnect(); };
   }, [containerRef, getPathFraction]);
 
+  // Measure actual card height on mobile → hide when walker passes midpoint
+  useEffect(() => {
+    if (!isMobile || !isRevealed) return;
+    const card = cardAreaRef.current;
+    const container = containerRef.current;
+    if (!card || !container) return;
+
+    const measure = () => {
+      const containerHeight = container.scrollHeight;
+      if (containerHeight <= 0) return;
+      const cardRect = card.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      // 75% point of the entire card area (from top of first card to bottom of last)
+      const cardMidOffset = cardRect.top - containerRect.top + cardRect.height * 0.75;
+      const hideTargetY = 500 * cardMidOffset / containerHeight;
+      setHideThreshold(getPathFraction(Math.min(hideTargetY, 499)));
+    };
+
+    // Wait a frame for the card to render fully
+    requestAnimationFrame(measure);
+  }, [isMobile, isRevealed, containerRef, getPathFraction]);
+
   const isFirst = index === 0;
   const isLast = stop.ctaText != null;
   const isRight = index === 4 ? false : index % 2 === 0; // 0,2 → right; 1,3 → left; 4 forced left (trail curves right)
 
   // Reactive — card appears/disappears as walker crosses threshold
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    setIsRevealed(latest >= threshold);
+    setIsRevealed(isMobile ? latest >= threshold && latest < hideThreshold : latest >= threshold);
   });
 
   return (
     <div
       ref={ref}
       id={`stop-${stop.id}`}
-      className={`min-h-[150vh] flex flex-col items-center justify-center px-6 py-24 relative ${
-        isFirst ? "pt-32" : index === 2 ? "pb-[60vh]" : index === 3 ? "pb-[80vh]" : ""
+      className={`min-h-[100vh] md:min-h-[150vh] flex flex-col items-center justify-center px-4 md:px-6 py-16 md:py-24 relative ${
+        isFirst ? "pt-28 md:pt-32" : index === 1 ? "pb-[28vh] md:pb-0" : index === 2 ? "pb-[40vh] md:pb-[60vh]" : index === 3 ? "pb-[30vh] md:pb-[80vh]" : index === 4 ? "pb-[80vh] md:pb-[80vh]" : index === 5 ? "pt-[5vh]" : ""
       }`}
     >
       {/* Location Pin */}
-      <div ref={pinRef} className={index === 2 ? "translate-x-[25vw]" : index === 4 ? "translate-x-[4.5vw]" : ""}>
+      <div ref={pinRef} className={index === 1 ? "-translate-x-[9vw] md:translate-x-0" : index === 2 ? "translate-x-[24vw] md:translate-x-[25vw]" : index === 4 ? "translate-x-[2vw] md:translate-x-[4.5vw]" : ""}>
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={isInView ? { scale: 1, opacity: 1 } : {}}
@@ -157,52 +190,71 @@ const TrailLocationStop = ({
       </motion.span>
       </div>
 
+      {/* Mobile backdrop — dims & blurs background when card is showing */}
+      <AnimatePresence>
+        {isRevealed && isMobile && (
+          <motion.div
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-10 bg-background/50 backdrop-blur-sm pointer-events-none"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Dotted connector + Card — fades in/out with walker */}
-      <div className="h-0 overflow-visible w-full -mt-[250px]">
+      <div className="h-0 overflow-visible w-full md:-mt-[250px] relative z-20">
       <AnimatePresence>
         {isRevealed && stop.steps ? (
           /* Step cards only — no wrapper card */
           <motion.div
+            ref={cardAreaRef}
             key="steps-section"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="z-20 w-full max-w-6xl mx-auto px-4 pt-[300px]"
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.4 }}
+            className="z-20 w-full max-w-6xl mx-auto px-2 md:px-4 pt-4 md:pt-[300px]"
           >
             <div className="w-px h-12 border-l-2 border-dashed border-primary/30 mx-auto" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            <div className="flex flex-col gap-2 md:grid md:grid-cols-4 md:gap-5">
               {stop.steps.map((step, i) => (
                 <motion.div
                   key={step.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: i * 1 }}
-                  className="relative bg-card rounded-3xl p-8 border border-border shadow-soft text-center"
+                  initial={{ opacity: 0, x: -40, md: { opacity: 0, y: 20 } }}
+                  animate={{ opacity: 1, x: 0, md: { opacity: 1, y: 0 } }}
+                  transition={{ duration: 0.4, delay: i * 0.15 }}
+                  className="relative bg-card rounded-2xl md:rounded-3xl p-4 md:p-8 border border-border shadow-soft flex items-center gap-4 md:flex-col md:text-center"
                 >
-                  <div className="relative w-16 h-16 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mx-auto mb-5">
-                    <step.icon className="w-8 h-8 text-amber-600 dark:text-amber-400" />
-                    <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center shadow-sm">
+                  <div className="relative w-10 h-10 md:w-16 md:h-16 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0 md:mx-auto md:mb-5">
+                    <step.icon className="w-5 h-5 md:w-8 md:h-8 text-amber-600 dark:text-amber-400" />
+                    <span className="absolute -top-1.5 -right-1.5 md:-top-2 md:-right-2 w-6 h-6 md:w-7 md:h-7 rounded-full bg-primary text-primary-foreground text-xs md:text-sm font-bold flex items-center justify-center shadow-sm">
                       {i + 1}
                     </span>
                   </div>
-                  <h4 className="font-display font-bold text-lg text-card-foreground">
-                    {step.title}
-                  </h4>
-                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-                    {step.description}
-                  </p>
+                  <div className="flex-1">
+                    <h4 className="font-display font-bold text-sm md:text-lg text-card-foreground">
+                      {step.title}
+                    </h4>
+                    <p className="mt-1 md:mt-3 text-xs md:text-sm text-muted-foreground leading-relaxed">
+                      {step.description}
+                    </p>
+                  </div>
                 </motion.div>
               ))}
             </div>
           </motion.div>
         ) : isRevealed ? (
           <motion.div
+            ref={cardAreaRef}
             key="card-section"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 12 }}
+            exit={{ opacity: 0, y: -10, transition: { duration: 0.4, delay: 0 } }}
             transition={{ duration: 0.5, delay: 0.25 }}
-            className="grid grid-cols-1 md:grid-cols-2 z-20 w-full"
+            className="flex flex-col items-center md:grid md:grid-cols-2 z-20 w-full"
           >
             {isRight && <div className="hidden md:block" />}
             <div className={`flex flex-col items-center ${isRight ? 'md:items-start md:pl-[20%]' : 'md:items-end md:pr-[20%]'}`}>
@@ -211,7 +263,7 @@ const TrailLocationStop = ({
 
               {/* Content Card — beside the trail */}
               <div
-                className="max-w-[450px] w-full bg-card rounded-3xl p-9 shadow-soft border border-border text-center"
+                className="max-w-[320px] md:max-w-[450px] w-full bg-card rounded-2xl md:rounded-3xl p-5 md:p-9 shadow-soft border border-border text-center"
               >
               {/* Title */}
               <h2
@@ -221,7 +273,7 @@ const TrailLocationStop = ({
               >
                 {isFirst ? (
                   <>
-                    Story<span className="text-gradient">Trail</span>
+                    Welcome To Story<span className="text-gradient">Trail</span>
                   </>
                 ) : (
                   stop.title
@@ -246,10 +298,16 @@ const TrailLocationStop = ({
                 {stop.description}
               </p>
 
+              {isFirst && (
+                <p className="mt-4 text-sm text-muted-foreground/70 italic">
+                  Scroll further to learn more about StoryTrail.
+                </p>
+              )}
+
               {/* Features */}
               {stop.features && (
                 stop.features.length === 6 ? (
-                  <div className="mt-5 grid grid-cols-3 gap-3 w-full">
+                  <div className="mt-4 md:mt-5 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 w-full">
                     {stop.features.map((feat) => (
                       <div
                         key={feat.text}

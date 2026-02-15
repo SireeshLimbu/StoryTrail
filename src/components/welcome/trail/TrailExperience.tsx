@@ -1,5 +1,5 @@
-import { useRef, useCallback } from "react";
-import { useScroll } from "framer-motion";
+import { useRef, useCallback, useState, useEffect } from "react";
+import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import TrailPath from "./TrailPath";
 import TrailMapDecorations from "./TrailMapDecorations";
 import TrailWalker from "./TrailWalker";
@@ -11,9 +11,23 @@ const TrailExperience = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
 
+  const [showScrollHint, setShowScrollHint] = useState(true);
+  const hintReady = useRef(false);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
+  });
+
+  // Grace period — don't hide the hint until 2s after mount (avoids HMR / restored scroll killing it)
+  useEffect(() => {
+    const timer = setTimeout(() => { hintReady.current = true; }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Hide scroll hint once user actually scrolls
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (hintReady.current && latest > 0.02) setShowScrollHint(false);
   });
 
   // Binary-search the SVG path to find the scrollYProgress fraction
@@ -79,6 +93,37 @@ const TrailExperience = () => {
         scrollYProgress={scrollYProgress}
         totalStops={trailStops.length}
       />
+
+      {/* Scroll-down hint — fixed to viewport, just below walker spawn */}
+      <AnimatePresence>
+        {showScrollHint && (
+          <motion.div
+            key="scroll-hint"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.4 } }}
+            transition={{ duration: 0.8, delay: 1 }}
+            className="fixed top-[18%] left-1/2 -translate-x-1/2 z-40 flex flex-col items-center pointer-events-none"
+          >
+            {/* Bouncing double chevron — large */}
+            <motion.div
+              animate={{ y: [0, 18, 0] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+              className="flex flex-col items-center"
+            >
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary drop-shadow-lg">
+                <polyline points="7 3 12 8 17 3" />
+                <polyline points="7 9 12 14 17 9" />
+              </svg>
+            </motion.div>
+
+            {/* Label */}
+            <span className="mt-4 text-base font-display font-semibold text-primary tracking-widest uppercase">
+              Scroll down
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };

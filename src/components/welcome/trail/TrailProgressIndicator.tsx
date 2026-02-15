@@ -11,7 +11,7 @@ const TrailProgressIndicator = ({
 }: TrailProgressIndicatorProps) => {
   return (
     <div
-      className="fixed right-3 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3"
+      className="fixed right-2 md:right-3 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2 md:gap-3"
       aria-hidden="true"
     >
       {Array.from({ length: totalStops }, (_, i) => (
@@ -57,7 +57,7 @@ const ProgressDot = ({
 
   return (
     <motion.button
-      className="w-2.5 h-2.5 rounded-full cursor-pointer"
+      className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full cursor-pointer"
       style={{ scale, backgroundColor }}
       onClick={handleClick}
       aria-label={`Go to stop ${index + 1}`}

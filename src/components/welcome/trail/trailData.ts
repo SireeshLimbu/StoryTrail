@@ -34,7 +34,7 @@ export const trailStops: TrailStop[] = [
   {
     id: 1,
     label: "Start Here",
-    title: "StoryTrail",
+    title: "Welcome To StoryTrail",
     subtitle: "Walk the story",
     description:
       "StoryTrail turns streets, landscapes, and historic sites into immersive stories and thrilling challenges you experience by walking through them.",

@@ -396,6 +396,30 @@ const Deer = ({ w = 60, h = 55 }: { w?: number; h?: number }) => (
   <img src={deerImg} alt="" width={w} height={h} style={{ objectFit: "contain" }} />
 );
 
+/* ── Small woodland pond ── */
+const Pond = ({ w = 80, h = 50 }: { w?: number; h?: number }) => (
+  <svg viewBox="0 0 80 50" width={w} height={h} fill="none">
+    {/* Shore rim */}
+    <ellipse cx="40" cy="28" rx="38" ry="20" fill="hsl(30 20% 55%)" opacity="0.25" />
+    {/* Water body */}
+    <ellipse cx="40" cy="27" rx="35" ry="18" fill="hsl(210 55% 30%)" />
+    {/* Lighter inner */}
+    <ellipse cx="38" cy="25" rx="26" ry="13" fill="hsl(210 50% 38%)" />
+    {/* Highlight shimmer */}
+    <ellipse cx="32" cy="22" rx="12" ry="5" fill="hsl(200 40% 55%)" opacity="0.3" />
+    <ellipse cx="48" cy="30" rx="8" ry="3.5" fill="hsl(200 40% 55%)" opacity="0.2" />
+    {/* Reeds */}
+    <line x1="12" y1="30" x2="11" y2="20" stroke={P.reed} strokeWidth="0.8" strokeLinecap="round" />
+    <ellipse cx="11" cy="19" rx="1.3" ry="2.5" fill={P.reed} opacity="0.6" />
+    <line x1="65" y1="32" x2="66" y2="22" stroke={P.reed} strokeWidth="0.8" strokeLinecap="round" />
+    <ellipse cx="66" cy="21" rx="1.3" ry="2.5" fill={P.reed} opacity="0.6" />
+    <line x1="14" y1="34" x2="12" y2="25" stroke={P.reed} strokeWidth="0.6" strokeLinecap="round" />
+    {/* Small rocks on shore */}
+    <ellipse cx="70" cy="35" rx="3" ry="1.5" fill={P.rockDark} opacity="0.3" />
+    <ellipse cx="8" cy="36" rx="2.5" ry="1.3" fill={P.rock} opacity="0.25" />
+  </svg>
+);
+
 /* ══════ Placement data: [left%, top%, Component, props?] ══════ */
 /* Trail path: x=50% center, curves to ~25% and ~75%
    Stops at: ~10%, ~30%, ~50%, ~70%, ~90% height
@@ -404,22 +428,34 @@ const Deer = ({ w = 60, h = 55 }: { w?: number; h?: number }) => (
 const TrailMapDecorations = () => (
   <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden" aria-hidden="true">
     {/* ── Section 1 (0-20%): Forest entrance ── */}
-    <Decor left="78%" top="5%" w={380} h={300}><TreeCluster w={380} h={300} /></Decor>
-    <Decor left="92%" top="8%" w={120} h={220}><TallPine w={120} h={220} /></Decor>
-    <Decor left="85%" top="13%" w={200} h={110}><Bushes w={200} h={110} /></Decor>
-    <Decor left="72%" top="16%" w={220} h={120}><Rocks w={220} h={120} /></Decor>
-    <Decor left="95%" top="17%" w={160} h={88}><Bushes w={160} h={88} /></Decor>
-    <Decor left="10%" top="3%" w={120} h={220}><TallPine w={120} h={220} /></Decor>
-    <Decor left="5%" top="8%" w={300} h={235}><TreeCluster w={300} h={235} /></Decor>
-    <Decor left="18%" top="12%" w={180} h={100}><Bushes w={180} h={100} /></Decor>
+    {/* Left tree row */}
+    <Decor left="3%" top="2%" w={140} h={110}><TreeCluster w={140} h={110} /></Decor>
+    <Decor left="7%" top="4%" w={100} h={180}><TallPine w={100} h={180} /></Decor>
+    <Decor left="2%" top="6%" w={120} h={220}><TallPine w={120} h={220} /></Decor>
+    <Decor left="5%" top="8%" w={140} h={78}><Bushes w={140} h={78} /></Decor>
+    <Decor left="6%" top="10%" w={160} h={88}><Bushes w={160} h={88} /></Decor>
+    <Decor left="4%" top="12%" w={100} h={180}><TallPine w={100} h={180} /></Decor>
+    <Decor left="8%" top="13%" w={120} h={95}><TreeCluster w={120} h={95} /></Decor>
     <Decor left="3%" top="15%" w={120} h={220}><TallPine w={120} h={220} /></Decor>
-    <Decor left="15%" top="18%" w={200} h={110}><Rocks w={200} h={110} /></Decor>
+    <Decor left="7%" top="17%" w={140} h={78}><Bushes w={140} h={78} /></Decor>
+    <Decor left="5%" top="19%" w={100} h={180}><TallPine w={100} h={180} /></Decor>
+    {/* Right tree row */}
     <Decor left="90%" top="2%" w={160} h={88}><Bushes w={160} h={88} /></Decor>
-    {/* Near-trail: rabbit + deer */}
-    <Decor left="62%" top="3%" w={80} h={40}><Rabbit w={80} h={40} /></Decor>
-    <Decor left="35%" top="8%" w={140} h={140}><Deer w={140} h={140} /></Decor>
-    <Decor left="30%" top="14%" w={200} h={110}><Bushes w={200} h={110} /></Decor>
-    <Decor left="68%" top="11%" w={120} h={220}><TallPine w={120} h={220} /></Decor>
+    <Decor left="96%" top="4%" w={100} h={180}><TallPine w={100} h={180} /></Decor>
+    <Decor left="93%" top="6%" w={120} h={95}><TreeCluster w={120} h={95} /></Decor>
+    <Decor left="92%" top="8%" w={120} h={220}><TallPine w={120} h={220} /></Decor>
+    <Decor left="96%" top="9%" w={140} h={78}><Bushes w={140} h={78} /></Decor>
+    <Decor left="94%" top="11%" w={140} h={78}><Bushes w={140} h={78} /></Decor>
+    <Decor left="97%" top="14%" w={100} h={180}><TallPine w={100} h={180} /></Decor>
+    <Decor left="91%" top="16%" w={120} h={95}><TreeCluster w={120} h={95} /></Decor>
+    <Decor left="95%" top="17%" w={160} h={88}><Bushes w={160} h={88} /></Decor>
+    <Decor left="93%" top="19%" w={100} h={180}><TallPine w={100} h={180} /></Decor>
+    <Decor left="91%" top="20%" w={140} h={110}><TreeCluster w={140} h={110} /></Decor>
+    {/* Rocks (non-tree accents) */}
+    <Decor left="72%" top="16%" w={220} h={120}><Rocks w={220} h={120} /></Decor>
+    <Decor left="15%" top="18%" w={200} h={110}><Rocks w={200} h={110} /></Decor>
+    {/* Near-trail: deer */}
+    <Decor left="35%" top="7%" w={140} h={140}><Deer w={140} h={140} /></Decor>
 
     {/* ── Section 2 (20-40%): Mountain range ── */}
     <Decor left="10%" top="23%" w={420} h={260}><Mountains w={420} h={260} /></Decor>
@@ -444,7 +480,7 @@ const TrailMapDecorations = () => (
     {/* River flowing across the map */}
     <Decor left="50%" top="60%" w={4000} h={840}><RiverDecor w={4000} h={840} /></Decor>
     {/* Bridge where the trail crosses the river */}
-    <Decor left="50%" top="58%" w={81} h={243}><Bridge w={81} h={243} /></Decor>
+    <Decor left="50%" top="55%" w={81} h={243}><Bridge w={81} h={243} /></Decor>
     <Decor left="93%" top="42%" w={120} h={220}><TallPine w={120} h={220} /></Decor>
     <Decor left="8%" top="43%" w={220} h={120}><Rocks w={220} h={120} /></Decor>
     {/* Near-trail: deer + rabbit */}
@@ -452,30 +488,22 @@ const TrailMapDecorations = () => (
     <Decor left="65%" top="42%" w={140} h={140}><Deer w={140} h={140} /></Decor>
 
     {/* ── Section 3.5 (44-58%): Village & cathedral filling the gap ── */}
-    {/* Cathedral — prominent on the left */}
-    <Decor left="14%" top="52%" w={260} h={245}><Cathedral w={260} h={245} /></Decor>
+    {/* Cathedral — prominent on the left, pushed up away from river */}
+    <Decor left="14%" top="45%" w={260} h={245}><Cathedral w={260} h={245} /></Decor>
     {/* Village houses scattered around */}
     <Decor left="6%" top="48%" w={100} h={90}><House w={100} h={90} /></Decor>
     <Decor left="24%" top="49%" w={80} h={72}><House w={80} h={72} /></Decor>
-    <Decor left="8%" top="55%" w={90} h={80}><House w={90} h={80} /></Decor>
     {/* Houses on right side */}
     <Decor left="82%" top="47%" w={90} h={80}><House w={90} h={80} /></Decor>
     <Decor left="92%" top="50%" w={80} h={72}><House w={80} h={72} /></Decor>
-    <Decor left="78%" top="54%" w={100} h={90}><House w={100} h={90} /></Decor>
     {/* Trees filling both sides */}
     <Decor left="88%" top="44%" w={300} h={235}><TreeCluster w={300} h={235} /></Decor>
     <Decor left="96%" top="48%" w={120} h={220}><TallPine w={120} h={220} /></Decor>
-    <Decor left="75%" top="52%" w={200} h={110}><Bushes w={200} h={110} /></Decor>
-    <Decor left="90%" top="56%" w={160} h={88}><Bushes w={160} h={88} /></Decor>
     <Decor left="4%" top="44%" w={120} h={220}><TallPine w={120} h={220} /></Decor>
     <Decor left="26%" top="46%" w={200} h={110}><Bushes w={200} h={110} /></Decor>
-    <Decor left="20%" top="56%" w={300} h={235}><TreeCluster w={300} h={235} /></Decor>
-    <Decor left="3%" top="58%" w={160} h={88}><Bushes w={160} h={88} /></Decor>
     {/* Near-trail accents */}
     <Decor left="38%" top="48%" w={120} h={220}><TallPine w={120} h={220} /></Decor>
     <Decor left="62%" top="46%" w={120} h={220}><TallPine w={120} h={220} /></Decor>
-    <Decor left="35%" top="54%" w={160} h={88}><Bushes w={160} h={88} /></Decor>
-    <Decor left="65%" top="52%" w={200} h={110}><Bushes w={200} h={110} /></Decor>
     <Decor left="60%" top="57%" w={70} h={40}><Rabbit w={70} h={40} /></Decor>
     <Decor left="85%" top="58%" w={220} h={120}><Rocks w={220} h={120} /></Decor>
 
